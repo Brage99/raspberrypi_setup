@@ -1,27 +1,25 @@
 import serial
 import time
+import pynmea2
 
-# Open serial port
-ser = serial.Serial(
-    port='/dev/serial0',      # Use the appropriate serial port for Pi 4
-    baudrate=9600,            # Set baudrate, adjust as per your needs
-    parity=serial.PARITY_NONE,
-    stopbits=serial.STOPBITS_ONE,
-    bytesize=serial.EIGHTBITS,
-    timeout=1                 # Set timeout to 1 second
-)
+port = '/dev/ttyS0'
+baud = 9600
+serialPort = serial.Serial(port, baudrate = baud, timeout = 0.5)
 
-try:
-    while True:
-        if ser.in_waiting > 0:
-            # Read a line of input from the serial port
-            = ser.readline().decode('utf-8').rstrip()
-            print("Received:", data)
-        else:
-            # Wait and check again
-            time.sleep(0.1)
-except KeyboardInterrupt:
-    pass
-finally:
-    # Close the serial port
-    ser.close()
+while True:
+    str = ''
+    try:
+        str = serialPort.readline().decode().strip()
+    except Exception as e:
+        print(e)
+
+    if str.find('GGA') > 0:
+        msg = None
+        try:
+            msg = pynmea2.parse(str)
+            strMsg = "Timestamp: %s,Lat: %s Lon: %s,Altitude: %s %s,Satellites: %s" % (msg.timestamp,ro>
+            print(strMsg)
+        except Exception as e:
+            print(e)
+    time.sleep(0.01)
+
